@@ -15,7 +15,10 @@ exports.userLogin = async (req, res, next) => {
         throw new Error();
       } else {
         // send response
-        res.status(200).json({ message: "signup successful" });
+        res.status(200).json({
+          message: "signup successful",
+          token: getToken(user.length[0].id),
+        });
       }
     } else {
       throw new Error();
@@ -50,3 +53,7 @@ exports.userSignup = (req, res, next) => {
     res.status(401).json({ error: "enter valid data" });
   }
 };
+//creating jwt token
+function getToken(id) {
+  return JWT.sign({ userId: id }, process.env.JWT_SECRET_KEY);
+}
