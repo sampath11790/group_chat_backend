@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../model/user");
+const JWT = require("jsonwebtoken");
 exports.userLogin = async (req, res, next) => {
   try {
     const obj = {
@@ -7,6 +8,7 @@ exports.userLogin = async (req, res, next) => {
       password: req.body.password,
     };
     const user = await User.findAll({ where: { email: obj.email } });
+
     if (user.length > 0) {
       //do somthing
       const isMatch = await bcrypt.compare(obj.password, user[0].password);
@@ -16,8 +18,8 @@ exports.userLogin = async (req, res, next) => {
       } else {
         // send response
         res.status(200).json({
-          message: "signup successful",
-          token: getToken(user.length[0].id),
+          message: "login successfull",
+          token: getToken(user[0].id),
         });
       }
     } else {
@@ -39,14 +41,18 @@ exports.userSignup = (req, res, next) => {
     const salt = 10;
 
     //password hasing
-    bcrypt.hash(req.body.password, salt, async function (err, hash) {
+    bcrypt.hash(req.body.password, salt, function (err, hash) {
       if (!err) {
         obj.password = hash;
         User.create(obj)
-          .then(res.status(200).json({ message: "signup successful" }))
-          .catch((err) => res.status(401).json({ error: "Enter valid data" }));
+          .then(() => {
+            res.status(200).json({ message: "signup successful" });
+          })
+          .catch((err) => {
+            res.status(401).json({ error: "Enter valid data" });
+          });
       } else {
-        res.status(401).json({ error: "Enter valid data" });
+        throw new Error();
       }
     });
   } catch (err) {

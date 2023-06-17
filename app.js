@@ -4,14 +4,19 @@ const app = express();
 const bodyparser = require("body-parser");
 const cors = require("cors");
 const UserRoute = require("./Route/User");
+const DB = require("./utli/database");
 //middleware
-app.use(bodyparser.json());
+app.use(bodyparser.json({ extended: false }));
 app.use(cors());
 app.use(UserRoute);
 
 app.use("/", (req, res, next) => {
   console.log(req);
 });
-app.listen(process.env.PORT, () => {
-  console.log(connected);
-});
+DB.sync()
+  .then(() => {
+    app.listen(process.env.PORT, () => {
+      console.log("connected");
+    });
+  })
+  .catch((err) => console.log(err));
