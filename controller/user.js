@@ -63,3 +63,14 @@ exports.userSignup = (req, res, next) => {
 function getToken(id) {
   return JWT.sign({ userId: id }, process.env.JWT_SECRET_KEY);
 }
+
+exports.getuserList = async (req, res, next) => {
+  try {
+    const user = await User.findAll({
+      attributes: ["email"],
+    });
+    res.status(200).json({ data: user });
+  } catch (err) {
+    res.status(401).json({ error: "enter valid data" });
+  }
+};
