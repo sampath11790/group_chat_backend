@@ -2,6 +2,32 @@ const Group = require("../model/group");
 const Message = require("../model/message");
 const User = require("../model/user");
 
+exports.getgroups = async (req, res, next) => {
+  try {
+    const group = await req.user.getGroups();
+    res.status(200).json({
+      data: group,
+    });
+  } catch (err) {
+    res.status(401).json({ error: "no group found" });
+  }
+};
+
+exports.getgroupusers = async (req, res, next) => {
+  try {
+    const groupid = req.body.groupid;
+    const group = await req.user.getGroups({ where: { id: groupid } });
+    const users = await group[0].getUsers();
+    // console.log(users);
+    res.status(200).json({
+      data: users,
+    });
+  } catch (err) {
+    // console.log(err);
+    res.status(401).json({ error: "no group found" });
+  }
+};
+
 exports.creategroup = async (req, res, next) => {
   try {
     // console.log("creategroup");

@@ -2,6 +2,8 @@ const express = require("express");
 
 const TokenValidation = require("../middleware/authentication");
 const {
+  getgroups,
+  getgroupusers,
   creategroup,
   adduser,
   deleteMember,
@@ -9,7 +11,8 @@ const {
 } = require("../controller/group");
 
 const route = express.Router();
-
+route.get("/group", TokenValidation, getgroups);
+route.post("/group/groupuser", TokenValidation, getgroupusers);
 route.post("/group/create", TokenValidation, creategroup);
 route.post("/group/user", TokenValidation, adduser);
 route.post("/group/join", TokenValidation, () => {});

@@ -8,6 +8,6 @@ const route = express.Router();
 // route.get("/user/message", TokenValidation, Message.getMessage);
 
 route.post("/user/message", TokenValidation, Message.postMessage);
-route.get("/user/message", TokenValidation, Message.getMessage);
+route.post("/user/messagelist", TokenValidation, Message.getMessage);
 
 module.exports = route;

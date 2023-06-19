@@ -34,18 +34,36 @@ exports.postMessage = async (req, res, next) => {
 
 exports.getMessage = async (req, res, next) => {
   try {
-    const messages = await Message.findAll({
-      where: { groupId: req.body.groupid },
-      attributes: {
-        exclude: ["userId", "updatedAt"],
-      },
-      include: [
-        {
-          model: User,
-          attributes: ["name"],
+    const startMessageId = req.query.startmessageid || 0;
+    let messages;
+    if (startMessageId) {
+      messages = await Message.findAll({
+        where: { groupId: req.body.groupid, id: { [Op.gte]: startMessageId } },
+        attributes: {
+          exclude: ["userId", "updatedAt"],
         },
-      ],
-    });
+        include: [
+          {
+            model: User,
+            attributes: ["name"],
+          },
+        ],
+      });
+    } else {
+      messages = await Message.findAll({
+        where: { groupId: req.body.groupid },
+        attributes: {
+          exclude: ["userId", "updatedAt"],
+        },
+        include: [
+          {
+            model: User,
+            attributes: ["name"],
+          },
+        ],
+      });
+    }
+
     res.status(200).json({ data: messages });
   } catch (err) {
     res.status(401).json({ error: "error", message: err });
