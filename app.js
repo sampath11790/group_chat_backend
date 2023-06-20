@@ -9,6 +9,28 @@ const Message = require("./model/message");
 const Group = require("./model/group");
 const GroupList = require("./model/grouplist");
 // const MessageList = require("./model/messagelist");
+app.use(cors());
+const io = require("socket.io")(8000, {
+  cors: {
+    origin: "*",
+  },
+});
+
+io.on("connection", (socket) => {
+  socket.on("send-message", (room) => {
+    console.log(room);
+    io.emit("receive-message", room);
+  });
+  socket.on("added-group", (useremail) => {
+    console.log("received-added-group emit", useremail);
+    io.emit("received-added-group", useremail);
+  });
+  socket.on("removed-group", (useremail) => {
+    console.log(useremail);
+    io.emit("received-removed-group", useremail);
+  });
+});
+
 //Route
 const UserRoute = require("./Route/User");
 const MessageRoute = require("./Route/message");

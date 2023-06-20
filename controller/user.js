@@ -21,6 +21,7 @@ exports.userLogin = async (req, res, next) => {
           message: "login successfull",
           token: getToken(user[0].id),
           name: user[0].name,
+          email: user[0].email,
         });
       }
     } else {
