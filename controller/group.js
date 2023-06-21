@@ -1,7 +1,7 @@
 const Group = require("../model/group");
 const Message = require("../model/message");
 const User = require("../model/user");
-
+const sequelize = require("../utli/database");
 exports.getgroups = async (req, res, next) => {
   try {
     const group = await req.user.getGroups();
@@ -88,12 +88,12 @@ exports.deleteMember = async (req, res, next) => {
     const user = groupmember[0];
     const groupInstance = group[0];
     //delete that user group messsage
-    const message = await Message.destroy({
-      where: {
-        userId: user.id,
-        groupId: groupInstance.id,
-      },
-    });
+    // const message = await Message.destroy({
+    //   where: {
+    //     userId: user.id,
+    //     groupId: groupInstance.id,
+    //   },
+    // });
 
     // remove the user from the group
     // if (message.length) {
@@ -128,5 +128,42 @@ exports.updateAdmin = async (req, res, next) => {
   } catch (err) {
     console.log(err);
     res.status(401).json({ error: "error " });
+  }
+};
+
+exports.deletegroup = async (req, res, next) => {
+  // Start a transaction
+  const t = await sequelize.transaction();
+  try {
+    //need data ,member name and group id,
+    const groupid = req.body.groupid;
+
+    // Fetch group  information
+
+    const group = await req.user.getGroups({ where: { id: groupid } });
+
+    // Check if the group and user exists
+    if (!group.length) {
+      return res.status(404).json({ message: "User or group not found" });
+    }
+
+    const groupInstance = group[0];
+    // delete that user group messsage
+    const message = await Message.destroy({
+      where: { groupId: groupInstance.id },
+      transaction: t,
+    });
+    // Delete the group instance
+    await groupInstance.destroy({ transaction: t });
+
+    await t.commit();
+
+    res.status(200).json({
+      message: "User removed from the group and messages deleted successfully",
+    });
+  } catch (err) {
+    await t.rollback();
+    // console.log(err);
+    res.status(401).json({ error: "user or group not found " });
   }
 };

@@ -3,6 +3,9 @@ const express = require("express");
 const app = express();
 const bodyparser = require("body-parser");
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
+const morgan = require("morgan");
 //schemas
 const User = require("./model/user");
 const Message = require("./model/message");
@@ -10,14 +13,27 @@ const Group = require("./model/group");
 const GroupList = require("./model/grouplist");
 // const MessageList = require("./model/messagelist");
 app.use(cors());
-const io = require("socket.io")(8000, {
+const io = require("socket.io")(8001, {
   cors: {
     origin: "*",
   },
 });
 
+const accesslogStream = fs.createWriteStream(
+  path.join(__dirname, "access.log"),
+  {
+    flags: "a",
+  }
+);
+app.use(morgan("combined", { stream: accesslogStream }));
 io.on("connection", (socket) => {
+  console.log("calling socket", socket.id);
+  socket.on("disconnect", () => {
+    console.log(`A client disconnected. Connection ID: ${socket.id}`);
+  });
+
   socket.on("send-message", (room) => {
+    console.log("calling socket===========================");
     console.log(room);
     io.emit("receive-message", room);
   });
@@ -26,8 +42,12 @@ io.on("connection", (socket) => {
     io.emit("received-added-group", useremail);
   });
   socket.on("removed-group", (useremail) => {
-    console.log(useremail);
+    console.log("removed-group");
     io.emit("received-removed-group", useremail);
+  });
+  socket.on("delete-group", (group) => {
+    console.log("delete-group");
+    io.emit("received-deleted-group", group);
   });
 });
 
