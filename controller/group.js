@@ -105,29 +105,17 @@ exports.deleteMember = async (req, res, next) => {
       message: "User removed from the group and messages deleted successfully",
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(401).json({ error: "user or group not found " });
   }
 };
 
 exports.updateAdmin = async (req, res, next) => {
   try {
-    // const userExists = await Group.findOne({
-    //   where: { id: req.body.groupid },
-    //   include: [{ model: User, where: { email: req.body.email } }],
-    // });
-    // console.log(userExists.users[0].grouplist.admin);
-    // if (!userExists.length) {
-    //   //user is not exist in this group
-    //   throw new Error();
-    // } else {
-    //   //exist in this this group
-    //   userExists[0].grouplist.update({ admin: true });
-    // }
     res.status(200).json({ message: "admin updated  successfull" });
   } catch (err) {
-    console.log(err);
-    res.status(401).json({ error: "error " });
+    // console.log(err);
+    res.status(404).json({ error: "error " });
   }
 };
 

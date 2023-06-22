@@ -13,7 +13,7 @@ const Group = require("./model/group");
 const GroupList = require("./model/grouplist");
 // const MessageList = require("./model/messagelist");
 app.use(cors());
-const io = require("socket.io")(8001, {
+const io = require("socket.io")(process.env.SOCKET, {
   cors: {
     origin: "*",
   },
@@ -79,7 +79,8 @@ Group.hasMany(Message);
 
 //sening error message when no route found
 app.use("/", (req, res, next) => {
-  console.log(req);
+  res.status(404).send(`<h1>Page Not Found</h1>`);
+  // console.log(req);
 });
 DB.sync()
   .then(() => {
